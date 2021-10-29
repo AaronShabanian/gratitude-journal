@@ -46,7 +46,8 @@ export default function GratitudeApp({ user}) {
       setGratitudes(gratitudes)
       setLoading(false)
     } else{
-      console.log(error)
+      setError(error)
+      setLoading(false)
     }
   }
 
