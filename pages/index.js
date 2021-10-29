@@ -1,27 +1,15 @@
 import Head from 'next/head'
 
 import React, { useEffect, useState } from "react";
+import GratitudeApp from '../components/GratitudeApp';
 import Greeting from '../components/Greeting'
 import History from '../components/History'
 import Input from '../components/Input'
+import {supabase} from "../utils/supabaseClient"
+import {Auth} from '@supabase/ui'
 export default function Home() {
-  const [user, setUser] =useState({
-    "name": "Aaron",
-    "email": "Shabanian@chapman.edu",
-  })
-  const [gratitudes, setGratitudes] =useState(
-    ["Choochoo", "dog"]
-  )
-
-  const [hasSubmittedToday, setSubmittedToday]= useState(
-    false
-  )
-  const addGratitude = (entry) =>{
-    let newGratitudes=[...gratitudes, entry]
-    setGratitudes(newGratitudes)
-    setSubmittedToday(true)
-  }
  
+  const { user } = Auth.useUser()
   return (
     <div className="bg-gray-700 min-h-screen min-w-screen">
       <Head>
@@ -30,22 +18,18 @@ export default function Home() {
       </Head>
 
       <main className="container mx-auto max-w-prose px-4 pt-12">
-        <Greeting user={user} gratitudes={gratitudes} hasSubmittedToday={hasSubmittedToday}></Greeting>
         {
-        !hasSubmittedToday  && <Input handleSubmit={addGratitude}/>
-        }
-        
-          {
-            /*
-            Making an if loop to decide if gratitudes should be shown or not
-            */
-            (gratitudes.length>0 ) && (
-              <p className="text-white text-2xl"> Previously you were grateful for <span className="font-bold"> 
-                <History gratitudes = {gratitudes.map(g => " "+g).toString()} /> 
-                </span> </p>
+          user ? ( <div>
+          
+            <GratitudeApp user={user}></GratitudeApp>
+            <button onClick={ async() => {let {error}= await supabase.auth.signOut()}}
+            className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-full">Logout</button>
 
-            )
-          }
+            </div>
+          ):(
+            <Auth supabaseClient={supabase} socialLayout="horizontal" socialButtonSize="xlarge"/>
+          )
+        }
           </main>
     </div>
   )
